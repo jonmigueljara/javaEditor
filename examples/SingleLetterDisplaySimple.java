@@ -64,9 +64,11 @@ public class SingleLetterDisplaySimple extends Application {
                     // key, which is represented as a character of value = 8 on Windows.
                     displayText.setText(characterTyped);
                     keyEvent.consume();
+
+                    gergnrn
                 }
 
-                centerText();
+               centerText();
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 // Arrow keys should be processed using the KEY_PRESSED event, because KEY_PRESSED
                 // events have a code that we can check (KEY_TYPED events don't have an associated
