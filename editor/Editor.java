@@ -14,14 +14,14 @@ import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 
 import java.util.LinkedList;
 /**
- * A JavaFX application that displays the letter the user has typed most recently in the center of
- * the window. Pressing the up and down arrows causes the font size to increase and decrease,
- * respectively.
+
  */
 public class Editor extends Application {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 500;
-    LinkedList<String> textList = new LinkedList<>();
+    Group root = new Group();
+    LinkedList<Text> textList = new LinkedList<>();
+
 
     /** An EventHandler to handle keys that get pressed. */
     private class KeyEventHandler implements EventHandler<KeyEvent> {
@@ -39,25 +39,12 @@ public class Editor extends Application {
         private String fontName = "Verdana";
 
         KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
-            textCenterX = 0 / 2;
-            textCenterY = 0 / 2;
 
-            // Initialize some empty text and add it to root so that it will be displayed.
-            displayText = new Text(textCenterX, textCenterY, "");
-            // Always set the text origin to be VPos.TOP! Setting the origin to be VPos.TOP means
-            // that when the text is assigned a y-position, that position corresponds to the
-            // highest position across all letters (for example, the top of a letter like "I", as
-            // opposed to the top of a letter like "e"), which makes calculating positions much
-            // simpler!
-            displayText.setTextOrigin(VPos.TOP);
-            displayText.setFont(Font.font(fontName, fontSize));
-
-            // All new Nodes need to be added to the root in order to be displayed.
-            root.getChildren().add(displayText);
         }
 
         @Override
         public void handle(KeyEvent keyEvent) {
+            root.getChildren().clear();
             if (keyEvent.getEventType() == KeyEvent.KEY_TYPED) {
                 // Use the KEY_TYPED event rather than KEY_PRESSED for letter keys, because with
                 // the KEY_TYPED event, javafx handles the "Shift" key and associated
@@ -67,15 +54,7 @@ public class Editor extends Application {
                     // Ignore control keys, which have non-zero length, as well as the backspace
                     // key, which is represented as a character of value = 8 on Windows.
 
-                    textList.add(characterTyped);
-                    String str = "";
-
-                    for (String s: textList) {
-                        str += s;
-                    }
-
-                    displayText.setText(str);
-
+                    render(characterTyped);
                     keyEvent.consume();
                 }
 
@@ -112,12 +91,26 @@ public class Editor extends Application {
             // Make sure the text appears in front of any other objects you might add.
             displayText.toFront();
         }
+
+        private void render(String characterTyped) {
+            /** get pos of previous character */
+            Text nextText = new Text(characterTyped);
+            nextText.setTextOrigin(VPos.TOP);
+            nextText.setFont(Font.font(fontName, fontSize));
+            /** get the width of the next char */
+            double nextCharWidth = nextText.getLayoutBounds().getWidth();
+
+            textList.add(nextText);
+            for (Text t : textList) {
+                root.getChildren().add(t);
+            }
+        }
     }
 
     @Override
     public void start(Stage primaryStage) {
         // Create a Node that will be the parent of all things displayed on the screen.
-        Group root = new Group();
+
         // The Scene represents the window: its height and width will be the height and width
         // of the window displayed.
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
@@ -125,11 +118,15 @@ public class Editor extends Application {
         // To get information about what keys the user is pressing, create an EventHandler.
         // EventHandler subclasses must override the "handle" function, which will be called
         // by javafx.
+
         EventHandler<KeyEvent> keyEventHandler =
                 new KeyEventHandler(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+
         // Register the event handler to be called for all KEY_PRESSED and KEY_TYPED events.
         scene.setOnKeyTyped(keyEventHandler);
         scene.setOnKeyPressed(keyEventHandler);
+
 
         primaryStage.setTitle("Multiple Letter Display Simple");
 
