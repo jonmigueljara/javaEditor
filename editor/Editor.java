@@ -39,8 +39,8 @@ public class Editor extends Application {
         private String fontName = "Verdana";
 
         KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
-            textCenterX = windowWidth / 2;
-            textCenterY = windowHeight / 2;
+            textCenterX = 0 / 2;
+            textCenterY = 0 / 2;
 
             // Initialize some empty text and add it to root so that it will be displayed.
             displayText = new Text(textCenterX, textCenterY, "");
@@ -79,7 +79,6 @@ public class Editor extends Application {
                     keyEvent.consume();
                 }
 
-                centerText();
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 // Arrow keys should be processed using the KEY_PRESSED event, because KEY_PRESSED
                 // events have a code that we can check (KEY_TYPED events don't have an associated
