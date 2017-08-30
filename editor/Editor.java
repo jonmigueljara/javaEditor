@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 
 import java.util.LinkedList;
@@ -20,7 +21,7 @@ public class Editor extends Application {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 500;
     Group root = new Group();
-    LinkedList<Text> textList = new LinkedList<>();
+    FastLinkedList textList = new FastLinkedList();
 
 
     /** An EventHandler to handle keys that get pressed. */
