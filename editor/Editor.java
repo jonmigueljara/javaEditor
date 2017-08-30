@@ -1,5 +1,8 @@
 package editor;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -10,7 +13,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
 
+import javafx.util.Duration;
 import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 
 import java.util.LinkedList;
@@ -22,12 +27,19 @@ public class Editor extends Application {
     private static final int WINDOW_HEIGHT = 500;
     Group root = new Group();
     FastLinkedList textList = new FastLinkedList();
+    private final Rectangle cursor;
+
+    public Editor() {
+        //initilaize rectangle for cursor
+        cursor = new Rectangle(0, 0);
+    }
 
 
     /** An EventHandler to handle keys that get pressed. */
     private class KeyEventHandler implements EventHandler<KeyEvent> {
         int textCenterX;
         int textCenterY;
+
 
         private static final int STARTING_FONT_SIZE = 20;
         private static final int STARTING_TEXT_POSITION_X = 250;
@@ -36,11 +48,25 @@ public class Editor extends Application {
         /** The Text to display on the screen. */
         private Text displayText = new Text(STARTING_TEXT_POSITION_X, STARTING_TEXT_POSITION_Y, "");
         private int fontSize = STARTING_FONT_SIZE;
-
         private String fontName = "Verdana";
 
-        KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
 
+
+        KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
+            //Initialize blank text so the we can use it's dimension for the cursor
+            displayText.setFont(Font.font(fontName, fontSize));
+            int charHeight = (int) displayText.getLayoutBounds().getHeight();
+            int cusorPos = (int) displayText.getLayoutBounds().getHeight()/2;
+
+            cursor.setWidth(1);
+            cursor.setHeight(charHeight);
+
+            // initialize cursor at the beginning
+            cursor.setX(0);
+            cursor.setY(0);
+
+            System.out.println("HERE");
+            root.getChildren().add(cursor);
         }
 
         @Override
@@ -55,6 +81,7 @@ public class Editor extends Application {
                     // key, which is represented as a character of value = 8 on Windows.
 
                     render(characterTyped);
+                    System.out.println("Color in type: " + cursor);
                     keyEvent.consume();
                 }
 
@@ -101,6 +128,7 @@ public class Editor extends Application {
             int prevX = 0;
             int prevY = 0;
             int prevCharWidth  = 0;
+            int newCharWidth = 0;
 
             if (!textList.isEmpty()) {
                 prevX = (int) (textList.getLast().getX());
@@ -113,12 +141,57 @@ public class Editor extends Application {
             nextText.setTextOrigin(VPos.TOP);
             nextText.setFont(Font.font(fontName, fontSize));
 
+            newCharWidth = (int) nextText.getLayoutBounds().getWidth();
+
             /* set the next character over one character length */
             nextText.setX(prevX + prevCharWidth);
+
+            /* move the cursor to the right by the charWidth */
+            cursor.setX(cursor.getX() + newCharWidth);
 
             textList.add(nextText);
             root.getChildren().add(nextText);
         }
+    }
+
+
+    /** An EventHandler to handle changing the color of the rectangle. */
+    private class RectangleBlinkEventHandler implements EventHandler<ActionEvent> {
+        private int currentColorIndex = 0;
+        private Color[] boxColors =
+                {Color.LIGHTPINK, Color.ORANGE, Color.BLACK,
+                    Color.GREEN, Color.DARKBLUE, Color.PURPLE};
+
+        RectangleBlinkEventHandler() {
+            // Set the color to be the first color in the list.
+            changeColor();
+        }
+
+        private void changeColor() {
+            cursor.setFill(boxColors[currentColorIndex]);
+//            System.out.println("Color in time: " + cursor.getFill());
+            System.out.println(cursor);
+            currentColorIndex = (currentColorIndex + 1) % boxColors.length;
+        }
+
+        @Override
+        public void handle(ActionEvent event) {
+
+            changeColor();
+        }
+    }
+
+    /** Makes the text bounding box change color periodically. */
+    public void makeRectangleColorChange() {
+        // Create a Timeline that will call the "handle" function of RectangleBlinkEventHandler
+        // every 1 second.
+        final Timeline timeline = new Timeline();
+        // The rectangle should continue blinking forever.
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        Editor.RectangleBlinkEventHandler cursorChange = new Editor.RectangleBlinkEventHandler();
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), cursorChange);
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.play();
     }
 
     @Override
@@ -140,6 +213,11 @@ public class Editor extends Application {
         // Register the event handler to be called for all KEY_PRESSED and KEY_TYPED events.
         scene.setOnKeyTyped(keyEventHandler);
         scene.setOnKeyPressed(keyEventHandler);
+
+
+
+        //call the color change
+        makeRectangleColorChange();
 
 
         primaryStage.setTitle("Multiple Letter Display Simple");
