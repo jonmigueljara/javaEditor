@@ -44,7 +44,6 @@ public class Editor extends Application {
 
         @Override
         public void handle(KeyEvent keyEvent) {
-            root.getChildren().clear();
             if (keyEvent.getEventType() == KeyEvent.KEY_TYPED) {
                 // Use the KEY_TYPED event rather than KEY_PRESSED for letter keys, because with
                 // the KEY_TYPED event, javafx handles the "Shift" key and associated
@@ -92,6 +91,11 @@ public class Editor extends Application {
             displayText.toFront();
         }
 
+
+        /**
+         * Method used for rendering from the textList LinkedList
+         * @param characterTyped
+         */
         private void render(String characterTyped) {
             int prevX = 0;
             int prevY = 0;
@@ -100,6 +104,7 @@ public class Editor extends Application {
             if (!textList.isEmpty()) {
                 prevX = (int) (textList.getLast().getX());
                 prevY = (int) (textList.getLast().getY());
+                /* get the width of the prev char */
                 prevCharWidth = (int) textList.getLast().getLayoutBounds().getWidth();
             }
             /* get pos of previous character */
@@ -107,19 +112,11 @@ public class Editor extends Application {
             nextText.setTextOrigin(VPos.TOP);
             nextText.setFont(Font.font(fontName, fontSize));
 
-            /* get the width of the next char */
-
-
-            System.out.println("char " + characterTyped);
-            System.out.println("char width: " + prevCharWidth);
-            System.out.println("prev X: " + prevX);
-
+            /* set the next character over one character length */
             nextText.setX(prevX + prevCharWidth);
 
             textList.add(nextText);
-            for (Text t : textList) {
-                root.getChildren().add(t);
-            }
+            root.getChildren().add(nextText);
         }
     }
 
