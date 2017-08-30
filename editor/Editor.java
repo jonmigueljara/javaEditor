@@ -93,12 +93,28 @@ public class Editor extends Application {
         }
 
         private void render(String characterTyped) {
-            /** get pos of previous character */
+            int prevX = 0;
+            int prevY = 0;
+            int prevCharWidth  = 0;
+
+            if (!textList.isEmpty()) {
+                prevX = (int) (textList.getLast().getX());
+                prevY = (int) (textList.getLast().getY());
+                prevCharWidth = (int) textList.getLast().getLayoutBounds().getWidth();
+            }
+            /* get pos of previous character */
             Text nextText = new Text(characterTyped);
             nextText.setTextOrigin(VPos.TOP);
             nextText.setFont(Font.font(fontName, fontSize));
-            /** get the width of the next char */
-            double nextCharWidth = nextText.getLayoutBounds().getWidth();
+
+            /* get the width of the next char */
+
+
+            System.out.println("char " + characterTyped);
+            System.out.println("char width: " + prevCharWidth);
+            System.out.println("prev X: " + prevX);
+
+            nextText.setX(prevX + prevCharWidth);
 
             textList.add(nextText);
             for (Text t : textList) {
