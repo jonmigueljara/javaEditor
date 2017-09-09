@@ -65,7 +65,6 @@ public class SingleLetterDisplaySimple extends Application {
                     displayText.setText(characterTyped);
                     keyEvent.consume();
 
-                    gergnrn
                 }
 
                centerText();
