@@ -55,6 +55,7 @@ public class Editor extends Application {
         KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
             //Initialize blank text so the we can use it's dimension for the cursor
             displayText.setFont(Font.font(fontName, fontSize));
+            //get character height for the cursor rectangle
             int charHeight = (int) displayText.getLayoutBounds().getHeight();
             int cusorPos = (int) displayText.getLayoutBounds().getHeight()/2;
 
@@ -64,8 +65,6 @@ public class Editor extends Application {
             // initialize cursor at the beginning
             cursor.setX(0);
             cursor.setY(0);
-
-            System.out.println("HERE");
             root.getChildren().add(cursor);
         }
 
@@ -81,7 +80,6 @@ public class Editor extends Application {
                     // key, which is represented as a character of value = 8 on Windows.
 
                     render(characterTyped);
-                    System.out.println("Color in type: " + cursor);
                     keyEvent.consume();
                 }
 
@@ -146,10 +144,13 @@ public class Editor extends Application {
             /* set the next character over one character length */
             nextText.setX(prevX + prevCharWidth);
 
-            /* move the cursor to the right by the charWidth */
+            //move the cursor to the right by the charWidth
             cursor.setX(cursor.getX() + newCharWidth);
-
+            
+            // add to the text list
             textList.add(nextText);
+
+            //render
             root.getChildren().add(nextText);
         }
     }
