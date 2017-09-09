@@ -146,7 +146,7 @@ public class Editor extends Application {
 
             //move the cursor to the right by the charWidth
             cursor.setX(cursor.getX() + newCharWidth);
-            
+
             // add to the text list
             textList.add(nextText);
 
