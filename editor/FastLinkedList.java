@@ -1,19 +1,20 @@
 package editor;
 import javafx.scene.text.Text;
+import java.util.*;
 
 /**
  * Created by jonmigueljara on 8/30/17.
  */
-public class FastLinkedList {
+public class FastLinkedList implements Iterable<Text> {
     int size = 0;
     Node head = null;
     Node tail = null;
     Node currentNode;
 
 
-    public Node add(Text text){
+    public Node add(Text text) {
         Node newNode = new Node(text);
-        if(size == 0){
+        if (size == 0) {
             head = newNode;
             tail = newNode;
         } else {
@@ -54,7 +55,7 @@ public class FastLinkedList {
 //    }
 
     public void deleteHead() {
-        if(size == 0){
+        if (size == 0) {
         } else {
             head = head.next;
             size--;
@@ -75,20 +76,52 @@ public class FastLinkedList {
 
 
     //get Size
-    public int getSize(){
+    public int getSize() {
         return size;
     }
 
 
-}
+    class Node {
+        Text text;
+        Node next;
+        Node previous;
 
-class Node {
-    Text text;
-    Node next;
-    Node previous;
-    public Node(Text text){
-        this.text = text;
-        next = null;
-        previous = null;
+        public Node(Text text) {
+            this.text = text;
+            next = null;
+            previous = null;
+        }
     }
+
+
+    public Iterator<Text> iterator()
+    {
+        return new LinkedListIterator();
+    }
+
+    private class LinkedListIterator  implements Iterator<Text>
+    {
+        private Node nextNode;
+
+        public LinkedListIterator()
+        {
+            nextNode = head;
+        }
+
+        public boolean hasNext()
+        {
+            return nextNode != null;
+        }
+
+        public Text next()
+        {
+            if (!hasNext()) throw new NoSuchElementException();
+            Text res = nextNode.text;
+            nextNode = nextNode.next;
+            return res;
+        }
+
+        public void remove() { throw new UnsupportedOperationException(); }
+    }
+
 }

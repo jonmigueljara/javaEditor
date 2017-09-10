@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.shape.Rectangle;
+import java.util.*;
 
 import javafx.util.Duration;
 import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
@@ -150,6 +151,12 @@ public class Editor extends Application {
             // add to the text list
             textList.add(nextText);
 
+
+
+            for (Text s : textList) {
+                System.out.println(s.getText());
+            }
+
             //render
             root.getChildren().add(nextText);
         }
@@ -170,8 +177,6 @@ public class Editor extends Application {
 
         private void changeColor() {
             cursor.setFill(boxColors[currentColorIndex]);
-//            System.out.println("Color in time: " + cursor.getFill());
-            System.out.println(cursor);
             currentColorIndex = (currentColorIndex + 1) % boxColors.length;
         }
 
