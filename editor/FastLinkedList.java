@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by jonmigueljara on 8/30/17.
  */
-public class FastLinkedList implements Iterable<Text> {
+public class FastLinkedList implements Iterable<FastLinkedList.Node> {
     int size = 0;
     Node head = null;
     Node tail = null;
@@ -26,33 +26,6 @@ public class FastLinkedList implements Iterable<Text> {
         return newNode;
     }
 
-//    public Node addAfter(int data, Node prevNode){
-//        if (prevNode == null){
-//            return null;
-//        } else if (prevNode == tail){//check if it a last node
-//            return add(data);
-//        } else {
-//            //create a new node
-//            Node newNode = new Node(data);
-//
-//            //store the next node of prevNode
-//            Node nextNode = prevNode.next;
-//
-//            //make new node next points to prevNode
-//            newNode.next = nextNode;
-//
-//            //make prevNode next points to new Node
-//            prevNode.next = newNode;
-//
-//            //make nextNode previous points to new node
-//            nextNode.previous = newNode;
-//
-//            //make  new Node previous points to prevNode
-//            newNode.previous = prevNode;
-//            size++;
-//            return newNode;
-//        }
-//    }
 
     public void deleteHead() {
         if (size == 0) {
@@ -81,7 +54,7 @@ public class FastLinkedList implements Iterable<Text> {
     }
 
 
-    class Node {
+    public class Node {
         Text text;
         Node next;
         Node previous;
@@ -94,12 +67,12 @@ public class FastLinkedList implements Iterable<Text> {
     }
 
 
-    public Iterator<Text> iterator()
+    public Iterator<FastLinkedList.Node> iterator()
     {
         return new LinkedListIterator();
     }
 
-    private class LinkedListIterator  implements Iterator<Text>
+    private class LinkedListIterator  implements Iterator<FastLinkedList.Node>
     {
         private Node nextNode;
 
@@ -113,10 +86,10 @@ public class FastLinkedList implements Iterable<Text> {
             return nextNode != null;
         }
 
-        public Text next()
+        public Node next()
         {
             if (!hasNext()) throw new NoSuchElementException();
-            Text res = nextNode.text;
+            Node res = nextNode;
             nextNode = nextNode.next;
             return res;
         }

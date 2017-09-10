@@ -30,6 +30,7 @@ public class Editor extends Application {
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
 
+
     public Editor() {
         //initilaize rectangle for cursor
         cursor = new Rectangle(0, 0);
@@ -41,7 +42,6 @@ public class Editor extends Application {
         int textCenterX;
         int textCenterY;
 
-
         private static final int STARTING_FONT_SIZE = 20;
         private static final int STARTING_TEXT_POSITION_X = 250;
         private static final int STARTING_TEXT_POSITION_Y = 250;
@@ -51,15 +51,14 @@ public class Editor extends Application {
         private int fontSize = STARTING_FONT_SIZE;
         private String fontName = "Verdana";
 
-
+        public int charHeight;
 
         KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
             //Initialize blank text so the we can use it's dimension for the cursor
             displayText.setFont(Font.font(fontName, fontSize));
             //get character height for the cursor rectangle
-            int charHeight = (int) displayText.getLayoutBounds().getHeight();
+            charHeight = (int) displayText.getLayoutBounds().getHeight();
             int cusorPos = (int) displayText.getLayoutBounds().getHeight()/2;
-
             cursor.setWidth(1);
             cursor.setHeight(charHeight);
 
@@ -80,7 +79,8 @@ public class Editor extends Application {
                     // Ignore control keys, which have non-zero length, as well as the backspace
                     // key, which is represented as a character of value = 8 on Windows.
 
-                    render(characterTyped);
+                    addChar(characterTyped);
+                    render(charHeight);
                     keyEvent.consume();
                 }
 
@@ -123,42 +123,64 @@ public class Editor extends Application {
          * Method used for rendering from the textList LinkedList
          * @param characterTyped
          */
-        private void render(String characterTyped) {
-            int prevX = 0;
-            int prevY = 0;
-            int prevCharWidth  = 0;
-            int newCharWidth = 0;
+        private void addChar(String characterTyped) {
 
-            if (!textList.isEmpty()) {
-                prevX = (int) (textList.getLast().getX());
-                prevY = (int) (textList.getLast().getY());
-                /* get the width of the prev char */
-                prevCharWidth = (int) textList.getLast().getLayoutBounds().getWidth();
-            }
             /* get pos of previous character */
             Text nextText = new Text(characterTyped);
             nextText.setTextOrigin(VPos.TOP);
             nextText.setFont(Font.font(fontName, fontSize));
 
-            newCharWidth = (int) nextText.getLayoutBounds().getWidth();
-
-            /* set the next character over one character length */
-            nextText.setX(prevX + prevCharWidth);
-
-            //move the cursor to the right by the charWidth
-            cursor.setX(cursor.getX() + newCharWidth);
-
             // add to the text list
             textList.add(nextText);
 
 
-
-            for (Text s : textList) {
-                System.out.println(s.getText());
-            }
-
-            //render
+            // add to the root
             root.getChildren().add(nextText);
+        }
+    }
+
+    /**
+     * Method used for rendering from the textList LinkedList
+     * loop through each text object and see if the word needs to move down
+     */
+    private void render(int charHeight) {
+        int xPos = 0;
+        int yPos = 0;
+        int lineNum = 0;
+
+        int prevX = 0;
+        int prevCharWidth  = 0;
+        int newCharWidth = 0;
+
+        FastLinkedList.Node prevNode;
+
+        // loop through every node in the textList
+        for (FastLinkedList.Node n : textList) {
+            // keep track of the previous Node
+            newCharWidth = (int) n.text.getLayoutBounds().getWidth();
+            if (n.previous == null){
+                prevX = 0;
+                prevCharWidth = 0;
+            } else {
+                prevNode = n.previous;
+                // get the previous X position and previous length
+                prevX = (int) (prevNode.text.getX());
+                prevCharWidth = (int) prevNode.text.getLayoutBounds().getWidth();
+            }
+            xPos += prevCharWidth;
+            if (xPos + newCharWidth > WINDOW_WIDTH) {
+                // if we are the edge of the window
+                // increment yPos by charHeight
+                yPos += charHeight;
+                //reset the xPos
+                xPos = 0;
+            }
+            n.text.setX(xPos);
+            n.text.setY(yPos);
+
+            // reset the cursor
+            cursor.setX(xPos + newCharWidth);
+            cursor.setY(yPos);
         }
     }
 
@@ -195,7 +217,7 @@ public class Editor extends Application {
         // The rectangle should continue blinking forever.
         timeline.setCycleCount(Timeline.INDEFINITE);
         Editor.RectangleBlinkEventHandler cursorChange = new Editor.RectangleBlinkEventHandler();
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), cursorChange);
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.5), cursorChange);
         timeline.getKeyFrames().add(keyFrame);
         timeline.play();
     }
