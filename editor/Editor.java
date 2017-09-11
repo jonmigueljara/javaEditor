@@ -70,6 +70,7 @@ public class Editor extends Application {
 
         @Override
         public void handle(KeyEvent keyEvent) {
+           RenderClass RenderObj = new RenderClass();
             if (keyEvent.getEventType() == KeyEvent.KEY_TYPED) {
                 // Use the KEY_TYPED event rather than KEY_PRESSED for letter keys, because with
                 // the KEY_TYPED event, javafx handles the "Shift" key and associated
@@ -80,7 +81,7 @@ public class Editor extends Application {
                     // key, which is represented as a character of value = 8 on Windows.
 
                     addChar(characterTyped);
-                    render(charHeight);
+                    RenderObj.render(charHeight);
                     keyEvent.consume();
                 }
 
@@ -89,34 +90,20 @@ public class Editor extends Application {
                 // events have a code that we can check (KEY_TYPED events don't have an associated
                 // KeyCode).
                 KeyCode code = keyEvent.getCode();
-                if (code == KeyCode.UP) {
-                    fontSize += 5;
-                    displayText.setFont(Font.font(fontName, fontSize));
-                    centerText();
-                } else if (code == KeyCode.DOWN) {
-                    fontSize = Math.max(0, fontSize - 5);
-                    displayText.setFont(Font.font(fontName, fontSize));
-                    centerText();
+                if (code == KeyCode.BACK_SPACE) {
+                    textList.deleteCurrentNode();
+                    RenderObj.render(charHeight);
+                    keyEvent.consume();
                 }
             }
+
+
+            for (FastLinkedList.Node n : textList) {
+                System.out.print(n.text.getText());
+            }
+            System.out.println();
         }
 
-        private void centerText() {
-            // Figure out the size of the current text.
-            double textHeight = displayText.getLayoutBounds().getHeight();
-            double textWidth = displayText.getLayoutBounds().getWidth();
-
-            // Calculate the position so that the text will be centered on the screen.
-            double textTop = textCenterY - textHeight / 2;
-            double textLeft = textCenterX - textWidth / 2;
-
-            // Re-position the text.
-            displayText.setX(textLeft);
-            displayText.setY(textTop);
-
-            // Make sure the text appears in front of any other objects you might add.
-            displayText.toFront();
-        }
 
 
         /**
@@ -133,71 +120,103 @@ public class Editor extends Application {
             // add to the text list
             textList.add(nextText);
 
-
             // add to the root
             root.getChildren().add(nextText);
+
         }
     }
 
-    /**
-     * Method used for rendering from the textList LinkedList
-     * loop through each text object and see if the word needs to move down
-     */
-    private void render(int charHeight) {
-        int xPos = 0;
-        int yPos = 0;
-        int lineNum = 0;
+    public class RenderClass {
+        private int xPos;
+        private int yPos;
+        private int prevCharWidth;
+        private int newCharWidth;
+        private int wordLegnth;
+        FastLinkedList.Node wordStart;
 
-        int prevX = 0;
-        int prevCharWidth  = 0;
-        int newCharWidth = 0;
-        int wordLegnth = 0;
+        //constructor
+        RenderClass()   {
+            // inititialize all variables used for rendering
+            xPos = 0;
+            yPos = 0;
+            prevCharWidth  = 0;
+            newCharWidth = 0;
+            wordLegnth = 0;
+            FastLinkedList.Node wordStart = textList.head;
+        }
 
-        FastLinkedList.Node prevNode;
-        FastLinkedList.Node wordStart = textList.head;
+        /**
+         * Method used for rendering from the textList LinkedList
+         * loop through each text object and see if the word needs to move down
+         */
+        public void render(int charHeight) {
 
-        // loop through every node in the textList
-        for (FastLinkedList.Node n : textList) {
-            // keep track of the previous Node
+            // loop through every node in the textList
+            for (FastLinkedList.Node n : textList) {
+                // set wordlength, wordstart, previous and new character widths
+                setRenderParams(n);
+
+                // increment the xPosition at the wordLength
+                xPos += prevCharWidth;
+                wordLegnth += newCharWidth;
+
+                // call method to handle word wrap
+                handleWordWrap(charHeight, n);
+
+                //set n's xPos and yPos
+                n.text.setX(xPos);
+                n.text.setY(yPos);
+
+                // reset the cursor
+                cursor.setX(xPos + newCharWidth);
+                cursor.setY(yPos);
+            }
+        }
+
+        private int bringWordDown(FastLinkedList.Node wordStart, FastLinkedList.Node n, int xPos, int yPos) {
+            while (wordStart != n) {
+                wordStart.text.setY(yPos);
+                wordStart.text.setX(xPos);
+                xPos += wordStart.text.getLayoutBounds().getWidth();
+                wordStart = wordStart.next;
+            }
+            return xPos;
+        }
+
+        private void setRenderParams (FastLinkedList.Node n) {
+            FastLinkedList.Node prevNode;
+            // keep track of the current Node width
             newCharWidth = (int) n.text.getLayoutBounds().getWidth();
             if (n.previous == null){
-                prevX = 0;
                 prevCharWidth = 0;
             } else {
+                if (n.previous.text.getText().equals(" ")) {
+                    wordLegnth = 0;
+                    wordStart = n;
+                }
                 prevNode = n.previous;
-                // get the previous X position and previous length
-                prevX = (int) (prevNode.text.getX());
+                // get the previous X width
                 prevCharWidth = (int) prevNode.text.getLayoutBounds().getWidth();
             }
-            xPos += prevCharWidth;
-            wordLegnth += prevCharWidth;
+        }
+
+        private void handleWordWrap(int charHeight, FastLinkedList.Node n) {
+            // if the next character is too long
             if (xPos + newCharWidth > WINDOW_WIDTH) {
                 yPos += charHeight;
-                if (wordLegnth + prevCharWidth < WINDOW_WIDTH) {
-                    System.out.println("PRINT");
-                    while (wordStart.next != null) {
-                        xPos = 0;
-                        wordStart.text.setY(yPos);
-                        wordStart.text.setX(xPos);
-                        xPos += wordStart.text.getLayoutBounds().getWidth();
-                        wordStart = wordStart.next;
-                    }
-                } else {
-                    // if we are the edge of the window
-                    // increment yPos by charHeight
+                xPos = 0;
 
-                    //reset the xPos
-                    xPos = 0;
+                // if the word fits in the next line
+                if (wordLegnth + newCharWidth < WINDOW_WIDTH) {
+                    // call bringWordDown method
+                    xPos = bringWordDown(wordStart, n, xPos, yPos);
                 }
             }
-            n.text.setX(xPos);
-            n.text.setY(yPos);
-
-            // reset the cursor
-            cursor.setX(xPos + newCharWidth);
-            cursor.setY(yPos);
         }
     }
+
+
+
 
 
     /** An EventHandler to handle changing the color of the rectangle. */
