@@ -1,4 +1,5 @@
 package editor;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import javafx.scene.text.Text;
 import java.util.*;
 
@@ -12,25 +13,56 @@ public class FastLinkedList implements Iterable<FastLinkedList.Node> {
     Node currentNode;
 
 
-    public Node add(Text text) {
+    public Node addAtCurrentNode(Text text) {
         Node newNode = new Node(text);
         if (size == 0) {
             head = newNode;
             tail = newNode;
         } else {
-            tail.next = newNode;
-            newNode.previous = tail;
-            tail = newNode;
+            // if not last
+            if (currentNode.next != null) {
+                currentNode.next.previous = newNode;
+            }
+            newNode.next = currentNode.next;
+            newNode.previous = currentNode;
+            currentNode.next = newNode;
         }
+        currentNode = newNode;
         size++;
         return newNode;
     }
 
 
-    public void deleteHead() {
+    public void deleteCurrentNode() {
+        // base case, there is nothing to delete
+        if (size == 0) {
+            return;
+        }
+       /* If node to be deleted is head node */
+        if (head == currentNode) {
+            head = currentNode.next;
+        }
+
+        /* Change next only if node to be deleted is NOT the last node */
+        if (currentNode.next != null) {
+            currentNode.next.previous = currentNode.previous;
+        }
+
+        /* Change prev only if node to be deleted is NOT the first node */
+        if (currentNode.previous != null) {
+            currentNode.previous.next = currentNode.next;
+        }
+        // move current node 1 spot back
+        currentNode = currentNode.previous;
+
+        /* Finally, free the memory occupied by CurrentNode */
+        return;
+    }
+
+    public void deleteLast() {
         if (size == 0) {
         } else {
-            head = head.next;
+            tail = tail.previous;
             size--;
         }
     }

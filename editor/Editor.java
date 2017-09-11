@@ -29,6 +29,8 @@ public class Editor extends Application {
     Group root = new Group();
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
+    int cursorX;
+    int cursorY;
 
 
     public Editor() {
@@ -72,38 +74,49 @@ public class Editor extends Application {
         public void handle(KeyEvent keyEvent) {
            RenderClass RenderObj = new RenderClass();
             if (keyEvent.getEventType() == KeyEvent.KEY_TYPED) {
-                // Use the KEY_TYPED event rather than KEY_PRESSED for letter keys, because with
-                // the KEY_TYPED event, javafx handles the "Shift" key and associated
-                // capitalization.
                 String characterTyped = keyEvent.getCharacter();
                 if (characterTyped.length() > 0 && characterTyped.charAt(0) != 8) {
-                    // Ignore control keys, which have non-zero length, as well as the backspace
-                    // key, which is represented as a character of value = 8 on Windows.
-
+                    //Backspace is represented as a character of value = 8 on Windows.
                     addChar(characterTyped);
                     RenderObj.render(charHeight);
                     keyEvent.consume();
                 }
 
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
-                // Arrow keys should be processed using the KEY_PRESSED event, because KEY_PRESSED
-                // events have a code that we can check (KEY_TYPED events don't have an associated
-                // KeyCode).
                 KeyCode code = keyEvent.getCode();
                 if (code == KeyCode.BACK_SPACE) {
-                    textList.deleteCurrentNode();
+                    deleteChar();
                     RenderObj.render(charHeight);
                     keyEvent.consume();
+
+                } else if (code == KeyCode.LEFT) {
+                    //move the current node left
+                    cursorX = cursorMoveLeft();
+
+                    cursorY = (int) textList.currentNode.previous.text.getY();
+                    textList.currentNode = textList.currentNode.previous;
+                    RenderObj.render(charHeight);
                 }
-            }
 
-
-            for (FastLinkedList.Node n : textList) {
-                System.out.print(n.text.getText());
             }
-            System.out.println();
         }
 
+
+        private void deleteChar() {
+            // new cursor position is the previous position + the previous character width
+            cursorX =  cursorMoveLeft();
+
+            root.getChildren().remove(textList.currentNode.text);
+            textList.deleteCurrentNode();
+        }
+
+
+        private int cursorMoveLeft() {
+            int xPos;
+            xPos = (int) textList.currentNode.previous.text.getX()
+                    + (int) textList.currentNode.previous.text.getLayoutBounds().getWidth();
+            return xPos;
+        }
 
 
         /**
@@ -117,12 +130,13 @@ public class Editor extends Application {
             nextText.setTextOrigin(VPos.TOP);
             nextText.setFont(Font.font(fontName, fontSize));
 
+           int newCharWidth = (int) nextText.getLayoutBounds().getWidth();
             // add to the text list
-            textList.add(nextText);
+            textList.addAtCurrentNode(nextText);
 
             // add to the root
             root.getChildren().add(nextText);
-
+            //cursorX += newCharWidth;
         }
     }
 
@@ -150,7 +164,6 @@ public class Editor extends Application {
          * loop through each text object and see if the word needs to move down
          */
         public void render(int charHeight) {
-
             // loop through every node in the textList
             for (FastLinkedList.Node n : textList) {
                 // set wordlength, wordstart, previous and new character widths
@@ -166,13 +179,25 @@ public class Editor extends Application {
                 //set n's xPos and yPos
                 n.text.setX(xPos);
                 n.text.setY(yPos);
-
-                // reset the cursor
-                cursor.setX(xPos + newCharWidth);
-                cursor.setY(yPos);
             }
+            System.out.println(cursorX);
+            if (textList.currentNode.previous != null ) {
+                cursor.setX((int) textList.currentNode.text.getX()
+                        + (int) textList.currentNode.text.getLayoutBounds().getWidth());
+            } else {
+                cursor.setX((int) textList.currentNode.text.getX() + (int) textList.currentNode.text.getLayoutBounds().getWidth());
+            }
+            cursor.setY((int)textList.currentNode.text.getY());
         }
 
+        /**
+         * Resets word based of Xpos and Ypos and returns the final Xpos
+         * @param wordStart pointer to start of the Node
+         * @param n current Node in the loop
+         * @param xPos current xPos in the rendering
+         * @param yPos current yPos in the rendering
+         * @return
+         */
         private int bringWordDown(FastLinkedList.Node wordStart, FastLinkedList.Node n, int xPos, int yPos) {
             while (wordStart != n) {
                 wordStart.text.setY(yPos);
@@ -183,6 +208,10 @@ public class Editor extends Application {
             return xPos;
         }
 
+        /**
+         * Method for setting paramters needed for renderer
+         * @param n - the current Node in the loop
+         */
         private void setRenderParams (FastLinkedList.Node n) {
             FastLinkedList.Node prevNode;
             // keep track of the current Node width
@@ -200,6 +229,11 @@ public class Editor extends Application {
             }
         }
 
+        /**
+         * Handles wrapping functionality
+         * @param charHeight height of the current font
+         * @param n current node in the loop
+         */
         private void handleWordWrap(int charHeight, FastLinkedList.Node n) {
             // if the next character is too long
             if (xPos + newCharWidth > WINDOW_WIDTH) {
@@ -214,9 +248,6 @@ public class Editor extends Application {
             }
         }
     }
-
-
-
 
 
     /** An EventHandler to handle changing the color of the rectangle. */
