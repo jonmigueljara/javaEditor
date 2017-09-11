@@ -29,8 +29,7 @@ public class Editor extends Application {
     Group root = new Group();
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
-    int cursorX;
-    int cursorY;
+
 
 
     public Editor() {
@@ -60,7 +59,8 @@ public class Editor extends Application {
             displayText.setFont(Font.font(fontName, fontSize));
             //get character height for the cursor rectangle
             charHeight = (int) displayText.getLayoutBounds().getHeight();
-            int cusorPos = (int) displayText.getLayoutBounds().getHeight()/2;
+            textList.addAtCurrentNode(displayText);
+
             cursor.setWidth(1);
             cursor.setHeight(charHeight);
 
@@ -84,18 +84,18 @@ public class Editor extends Application {
 
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 KeyCode code = keyEvent.getCode();
-                if (code == KeyCode.BACK_SPACE) {
-                    deleteChar();
-                    RenderObj.render(charHeight);
-                    keyEvent.consume();
 
-                } else if (code == KeyCode.LEFT) {
-                    //move the current node left
-                    cursorX = cursorMoveLeft();
+                if (textList.currentNode.previous != null) {
+                    if (code == KeyCode.BACK_SPACE) {
+                        deleteChar();
+                        RenderObj.render(charHeight);
+                        keyEvent.consume();
 
-                    cursorY = (int) textList.currentNode.previous.text.getY();
-                    textList.currentNode = textList.currentNode.previous;
-                    RenderObj.render(charHeight);
+                    } else if (code == KeyCode.LEFT) {
+                        //move the current node left
+                        textList.currentNode = textList.currentNode.previous;
+                        RenderObj.render(charHeight);
+                    }
                 }
 
             }
@@ -104,19 +104,11 @@ public class Editor extends Application {
 
         private void deleteChar() {
             // new cursor position is the previous position + the previous character width
-            cursorX =  cursorMoveLeft();
 
             root.getChildren().remove(textList.currentNode.text);
             textList.deleteCurrentNode();
         }
 
-
-        private int cursorMoveLeft() {
-            int xPos;
-            xPos = (int) textList.currentNode.previous.text.getX()
-                    + (int) textList.currentNode.previous.text.getLayoutBounds().getWidth();
-            return xPos;
-        }
 
 
         /**
@@ -180,13 +172,15 @@ public class Editor extends Application {
                 n.text.setX(xPos);
                 n.text.setY(yPos);
             }
-            System.out.println(cursorX);
             if (textList.currentNode.previous != null ) {
                 cursor.setX((int) textList.currentNode.text.getX()
                         + (int) textList.currentNode.text.getLayoutBounds().getWidth());
             } else {
-                cursor.setX((int) textList.currentNode.text.getX() + (int) textList.currentNode.text.getLayoutBounds().getWidth());
+                System.out.println(textList.currentNode.text.getText());
+                cursor.setX((int) textList.currentNode.text.getX()
+                        + (int) textList.currentNode.text.getLayoutBounds().getWidth());
             }
+            System.out.println(textList.size);
             cursor.setY((int)textList.currentNode.text.getY());
         }
 
