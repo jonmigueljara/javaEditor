@@ -151,8 +151,10 @@ public class Editor extends Application {
         int prevX = 0;
         int prevCharWidth  = 0;
         int newCharWidth = 0;
+        int wordLegnth = 0;
 
         FastLinkedList.Node prevNode;
+        FastLinkedList.Node wordStart = textList.head;
 
         // loop through every node in the textList
         for (FastLinkedList.Node n : textList) {
@@ -168,12 +170,25 @@ public class Editor extends Application {
                 prevCharWidth = (int) prevNode.text.getLayoutBounds().getWidth();
             }
             xPos += prevCharWidth;
+            wordLegnth += prevCharWidth;
             if (xPos + newCharWidth > WINDOW_WIDTH) {
-                // if we are the edge of the window
-                // increment yPos by charHeight
                 yPos += charHeight;
-                //reset the xPos
-                xPos = 0;
+                if (wordLegnth + prevCharWidth < WINDOW_WIDTH) {
+                    System.out.println("PRINT");
+                    while (wordStart.next != null) {
+                        xPos = 0;
+                        wordStart.text.setY(yPos);
+                        wordStart.text.setX(xPos);
+                        xPos += wordStart.text.getLayoutBounds().getWidth();
+                        wordStart = wordStart.next;
+                    }
+                } else {
+                    // if we are the edge of the window
+                    // increment yPos by charHeight
+
+                    //reset the xPos
+                    xPos = 0;
+                }
             }
             n.text.setX(xPos);
             n.text.setY(yPos);
@@ -248,7 +263,7 @@ public class Editor extends Application {
         makeRectangleColorChange();
 
 
-        primaryStage.setTitle("Multiple Letter Display Simple");
+        primaryStage.setTitle("Jon Miguel Editor");
 
         // This is boilerplate, necessary to setup the window where things are displayed.
         primaryStage.setScene(scene);
