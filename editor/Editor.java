@@ -92,6 +92,20 @@ public class Editor extends Application {
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 KeyCode code = keyEvent.getCode();
 
+                if (code == KeyCode.UP) {
+                    System.out.println("Here");
+                    if (currentLine != 0) {
+                        currentLine--;
+                    }
+                    System.out.println("Current Line " + currentLine);
+                    System.out.println("Prev Line node:" + lineMap.get(currentLine).text.getText());
+                    System.out.println( "Current Node: " + textList.currentNode.text.getText());
+
+                    searchline(currentLine, (int) textList.currentNode.text.getX());
+                    cursor.setX((int) textList.currentNode.text.getX());
+                    cursor.setY((int) textList.currentNode.text.getY());
+                }
+
                 if (textList.currentNode.previous != null) {
                     if (code == KeyCode.BACK_SPACE) {
                         deleteChar();
@@ -102,6 +116,7 @@ public class Editor extends Application {
                         //move the current node left
                         textList.currentNode = textList.currentNode.previous;
                         RenderObj.render(charHeight);
+                        keyEvent.consume();
                     }
                 }
 
@@ -110,14 +125,23 @@ public class Editor extends Application {
                         //move the current node Right
                         textList.currentNode = textList.currentNode.next;
                         RenderObj.render(charHeight);
+                        keyEvent.consume();
                     }
-                } else if (code == KeyCode.UP) {
 
                 }
+
 
             }
         }
 
+        private void searchline (int line, int xPos) {
+            FastLinkedList.Node nodePtr = lineMap.get(line);
+            while (nodePtr.next.text.getX() < xPos + nodePtr.next.text.getLayoutBounds().getWidth()) {
+                nodePtr = nodePtr.next;
+            }
+            System.out.println(nodePtr.text.getText());
+            textList.currentNode = nodePtr;
+        }
 
         private void deleteChar() {
             // new cursor position is the previous position + the previous character width
