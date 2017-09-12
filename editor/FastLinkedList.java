@@ -11,13 +11,16 @@ public class FastLinkedList implements Iterable<FastLinkedList.Node> {
     Node head = null;
     Node tail = null;
     Node currentNode;
+    Node prevLineStart;
+    Node currentLineStart;
 
 
-    public Node addAtCurrentNode(Text text) {
+    public void addAtCurrentNode(Text text) {
         Node newNode = new Node(text);
         if (size == 0) {
             head = newNode;
             tail = newNode;
+            currentLineStart = newNode;
         } else {
             // if not last
             if (currentNode.next != null) {
@@ -29,7 +32,6 @@ public class FastLinkedList implements Iterable<FastLinkedList.Node> {
         }
         currentNode = newNode;
         size++;
-        return newNode;
     }
 
 
@@ -58,6 +60,7 @@ public class FastLinkedList implements Iterable<FastLinkedList.Node> {
         /* Finally, free the memory occupied by CurrentNode */
         return;
     }
+
 
     public void deleteLast() {
         if (size == 0) {

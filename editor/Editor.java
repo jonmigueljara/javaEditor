@@ -17,18 +17,19 @@ import javafx.scene.shape.Rectangle;
 import java.util.*;
 
 import javafx.util.Duration;
-import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 
-import java.util.LinkedList;
-/**
 
- */
+
+
 public class Editor extends Application {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 500;
-    Group root = new Group();
+    private Group root = new Group();
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
+
+    int currentLine;
+    private HashMap<Integer, FastLinkedList.Node> lineMap = new HashMap<Integer, FastLinkedList.Node>();
 
 
 
@@ -40,8 +41,7 @@ public class Editor extends Application {
 
     /** An EventHandler to handle keys that get pressed. */
     private class KeyEventHandler implements EventHandler<KeyEvent> {
-        int textCenterX;
-        int textCenterY;
+
 
         private static final int STARTING_FONT_SIZE = 20;
         private static final int STARTING_TEXT_POSITION_X = 250;
@@ -52,6 +52,7 @@ public class Editor extends Application {
         private int fontSize = STARTING_FONT_SIZE;
         private String fontName = "Verdana";
 
+
         public int charHeight;
 
         KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
@@ -60,6 +61,8 @@ public class Editor extends Application {
             //get character height for the cursor rectangle
             charHeight = (int) displayText.getLayoutBounds().getHeight();
             textList.addAtCurrentNode(displayText);
+
+            lineMap.put(0, textList.head);
 
             cursor.setWidth(1);
             cursor.setHeight(charHeight);
@@ -80,6 +83,10 @@ public class Editor extends Application {
                     addChar(characterTyped);
                     RenderObj.render(charHeight);
                     keyEvent.consume();
+//                    System.out.println("Current: " + currentLine);
+                    for (int i = 0; i < currentLine; i++) {
+                        System.out.println("i: " + i + " " + lineMap.get(i).text.getText());
+                    }
                 }
 
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
@@ -104,6 +111,8 @@ public class Editor extends Application {
                         textList.currentNode = textList.currentNode.next;
                         RenderObj.render(charHeight);
                     }
+                } else if (code == KeyCode.UP) {
+
                 }
 
             }
@@ -136,7 +145,6 @@ public class Editor extends Application {
 
             // add to the root
             root.getChildren().add(nextText);
-            //cursorX += newCharWidth;
         }
     }
 
@@ -165,6 +173,7 @@ public class Editor extends Application {
          * @param charHeight
          */
         public void render(int charHeight) {
+            currentLine = 0;
             // loop through every node in the textList
             for (FastLinkedList.Node n : textList) {
                 // set wordlength, wordstart, previous and new character widths
@@ -175,7 +184,10 @@ public class Editor extends Application {
                 wordLegnth += newCharWidth;
 
                 // call method to handle word wrap
-                handleWordWrap(charHeight, n);
+                // if the next character is too long
+                if (xPos + newCharWidth > WINDOW_WIDTH) {
+                    handleWordWrap(charHeight, n);
+                }
 
                 //set n's xPos and yPos
                 n.text.setX(xPos);
@@ -236,18 +248,18 @@ public class Editor extends Application {
          * @param n current node in the loop
          */
         private void handleWordWrap(int charHeight, FastLinkedList.Node n) {
-            // if the next character is too long
-            if (xPos + newCharWidth > WINDOW_WIDTH) {
                 yPos += charHeight;
                 xPos = 0;
-
                 // if the word fits in the next line
                 if (wordLegnth + newCharWidth < WINDOW_WIDTH) {
                     // call bringWordDown method
                     xPos = bringWordDown(wordStart, n, xPos, yPos);
+                    lineMap.put(++currentLine, wordStart);
+                } else {
+                    lineMap.put(++currentLine, n);
                 }
+
             }
-        }
     }
 
 
