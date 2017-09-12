@@ -98,6 +98,14 @@ public class Editor extends Application {
                     }
                 }
 
+                if (textList.currentNode.next != null) {
+                    if (code == KeyCode.RIGHT) {
+                        //move the current node Right
+                        textList.currentNode = textList.currentNode.next;
+                        RenderObj.render(charHeight);
+                    }
+                }
+
             }
         }
 
@@ -154,6 +162,7 @@ public class Editor extends Application {
         /**
          * Method used for rendering from the textList LinkedList
          * loop through each text object and see if the word needs to move down
+         * @param charHeight
          */
         public void render(int charHeight) {
             // loop through every node in the textList
@@ -176,11 +185,9 @@ public class Editor extends Application {
                 cursor.setX((int) textList.currentNode.text.getX()
                         + (int) textList.currentNode.text.getLayoutBounds().getWidth());
             } else {
-                System.out.println(textList.currentNode.text.getText());
                 cursor.setX((int) textList.currentNode.text.getX()
                         + (int) textList.currentNode.text.getLayoutBounds().getWidth());
             }
-            System.out.println(textList.size);
             cursor.setY((int)textList.currentNode.text.getY());
         }
 
