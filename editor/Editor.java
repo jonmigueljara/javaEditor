@@ -96,6 +96,7 @@ public class Editor extends Application {
                         searchline(currentLine, (int) textList.currentNode.text.getX());
                         setCursorToCurrentNode();
                     }
+                    System.out.println("Current Line: " + currentLine);
                 } else if (code == KeyCode.DOWN) {
 
                     if (currentLine != maxLine) {
@@ -149,7 +150,7 @@ public class Editor extends Application {
 
         private void searchline (int line, int xPos) {
             FastLinkedList.Node nodePtr = lineMap.get(line);
-            while (nodePtr.next.text.getX() < xPos && nodePtr.next != null) {
+            while (nodePtr.next != null && nodePtr.next.text.getX() < xPos) {
                 nodePtr = nodePtr.next;
             }
             textList.currentNode = nodePtr;
