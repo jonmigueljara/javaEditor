@@ -29,6 +29,7 @@ public class Editor extends Application {
     private final Rectangle cursor;
 
     int currentLine;
+    int maxLine;
     private HashMap<Integer, FastLinkedList.Node> lineMap = new HashMap<Integer, FastLinkedList.Node>();
 
 
@@ -83,27 +84,27 @@ public class Editor extends Application {
                     addChar(characterTyped);
                     RenderObj.render(charHeight);
                     keyEvent.consume();
-//                    System.out.println("Current: " + currentLine);
-                    for (int i = 0; i < currentLine; i++) {
-                        System.out.println("i: " + i + " " + lineMap.get(i).text.getText());
-                    }
                 }
 
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 KeyCode code = keyEvent.getCode();
 
                 if (code == KeyCode.UP) {
-                    System.out.println("Here");
+                    System.out.println(currentLine);
                     if (currentLine != 0) {
                         currentLine--;
+                        searchline(currentLine, (int) textList.currentNode.text.getX());
+                        setCursorToCurrentNode();
                     }
-                    System.out.println("Current Line " + currentLine);
-                    System.out.println("Prev Line node:" + lineMap.get(currentLine).text.getText());
-                    System.out.println( "Current Node: " + textList.currentNode.text.getText());
+                } else if (code == KeyCode.DOWN) {
 
-                    searchline(currentLine, (int) textList.currentNode.text.getX());
-                    cursor.setX((int) textList.currentNode.text.getX());
-                    cursor.setY((int) textList.currentNode.text.getY());
+                    if (currentLine != maxLine) {
+                        currentLine++;
+                        searchline(currentLine, (int) textList.currentNode.text.getX());
+                        setCursorToCurrentNode();
+                    }
+                    System.out.println("Current Line: " + currentLine);
+                    System.out.println("Max Line: " + maxLine);
                 }
 
                 if (textList.currentNode.previous != null) {
@@ -113,33 +114,44 @@ public class Editor extends Application {
                         keyEvent.consume();
 
                     } else if (code == KeyCode.LEFT) {
+                        // if the right node is at X = 0, then we jumped down a line
+                        if (textList.currentNode.previous.text.getX() == 0) {
+                            currentLine--;
+                        }
                         //move the current node left
                         textList.currentNode = textList.currentNode.previous;
-                        RenderObj.render(charHeight);
+                        setCursorToCurrentNode();
                         keyEvent.consume();
                     }
                 }
 
                 if (textList.currentNode.next != null) {
                     if (code == KeyCode.RIGHT) {
+                        // if the right node is at X = 0, then we jumped down a line
+                        if (textList.currentNode.next.text.getX() == 0) {
+                            currentLine++;
+                        }
                         //move the current node Right
                         textList.currentNode = textList.currentNode.next;
-                        RenderObj.render(charHeight);
+                        setCursorToCurrentNode();
                         keyEvent.consume();
                     }
 
                 }
-
-
             }
+        }
+
+        private void setCursorToCurrentNode() {
+            cursor.setX((int) textList.currentNode.text.getX()
+                    + (int) textList.currentNode.text.getLayoutBounds().getWidth());
+            cursor.setY((int) textList.currentNode.text.getY());
         }
 
         private void searchline (int line, int xPos) {
             FastLinkedList.Node nodePtr = lineMap.get(line);
-            while (nodePtr.next.text.getX() < xPos + nodePtr.next.text.getLayoutBounds().getWidth()) {
+            while (nodePtr.next.text.getX() < xPos && nodePtr.next != null) {
                 nodePtr = nodePtr.next;
             }
-            System.out.println(nodePtr.text.getText());
             textList.currentNode = nodePtr;
         }
 
@@ -198,6 +210,7 @@ public class Editor extends Application {
          */
         public void render(int charHeight) {
             currentLine = 0;
+            maxLine = 0;
             // loop through every node in the textList
             for (FastLinkedList.Node n : textList) {
                 // set wordlength, wordstart, previous and new character widths
@@ -210,7 +223,7 @@ public class Editor extends Application {
                 // call method to handle word wrap
                 // if the next character is too long
                 if (xPos + newCharWidth > WINDOW_WIDTH) {
-                    handleWordWrap(charHeight, n);
+                   xPos = handleWordWrap(charHeight, n);
                 }
 
                 //set n's xPos and yPos
@@ -218,9 +231,6 @@ public class Editor extends Application {
                 n.text.setY(yPos);
             }
             if (textList.currentNode.previous != null ) {
-                cursor.setX((int) textList.currentNode.text.getX()
-                        + (int) textList.currentNode.text.getLayoutBounds().getWidth());
-            } else {
                 cursor.setX((int) textList.currentNode.text.getX()
                         + (int) textList.currentNode.text.getLayoutBounds().getWidth());
             }
@@ -253,9 +263,11 @@ public class Editor extends Application {
             FastLinkedList.Node prevNode;
             // keep track of the current Node width
             newCharWidth = (int) n.text.getLayoutBounds().getWidth();
+            // if empty
             if (n.previous == null){
                 prevCharWidth = 0;
             } else {
+                // restart word count
                 if (n.previous.text.getText().equals(" ")) {
                     wordLegnth = 0;
                     wordStart = n;
@@ -271,7 +283,7 @@ public class Editor extends Application {
          * @param charHeight height of the current font
          * @param n current node in the loop
          */
-        private void handleWordWrap(int charHeight, FastLinkedList.Node n) {
+        private int handleWordWrap(int charHeight, FastLinkedList.Node n) {
                 yPos += charHeight;
                 xPos = 0;
                 // if the word fits in the next line
@@ -282,8 +294,10 @@ public class Editor extends Application {
                 } else {
                     lineMap.put(++currentLine, n);
                 }
-
-            }
+            //keep track of max line
+            maxLine++;
+            return xPos;
+        }
     }
 
 
