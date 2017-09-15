@@ -2,6 +2,8 @@ package editor;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -25,13 +27,14 @@ import javafx.util.Duration;
 
 
 public class Editor extends Application {
-    private static final int WINDOW_WIDTH = 500;
-    private static final int WINDOW_HEIGHT = 500;
+    private static  int WINDOW_WIDTH;
+    private static  int WINDOW_HEIGHT;
     private Group root = new Group();
     Group textRoot = new Group();
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
     public int charHeight;
+    int scrollAdjust;
 
     int currentLine;
     int maxLine;
@@ -43,6 +46,8 @@ public class Editor extends Application {
     public Editor() {
         //initilaize rectangle for cursor
         cursor = new Rectangle(0, 0);
+        WINDOW_WIDTH = 500;
+        WINDOW_HEIGHT = 500;
     }
 
 
@@ -98,8 +103,6 @@ public class Editor extends Application {
 
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 KeyCode code = keyEvent.getCode();
-                System.out.println("Current Line: " +  cursorLine);
-                System.out.println("Max Line: " +  maxLine);
                 if (code == KeyCode.COMMAND) {
                     System.out.println("Current Node: " + textList.currentNode.text.getText());
                     for (int i = 0; i <= maxLine; i++) {
@@ -376,7 +379,7 @@ public class Editor extends Application {
             double line;
 
 
-            line = Math.floor(mousePressedY/charHeight);
+            line = Math.floor((mousePressedY + scrollAdjust)/charHeight);
             // Display text right above the click.
 
             if (line <= maxLine) {
@@ -428,6 +431,10 @@ public class Editor extends Application {
         timeline.play();
     }
 
+
+
+
+
     @Override
     public void start(Stage primaryStage) {
         // Create a Node that will be the parent of all things displayed on the screen.
@@ -439,7 +446,7 @@ public class Editor extends Application {
 
         Scene scene = new Scene(root, WINDOW_WIDTH + 20, WINDOW_HEIGHT, Color.WHITE);
 
-
+        RenderClass RenderObj = new RenderClass();
 
         // Make a vertical scroll bar on the right side of the screen.
         ScrollBar scrollBar = new ScrollBar();
@@ -455,6 +462,54 @@ public class Editor extends Application {
 
         // Add the scroll bar to the scene graph, so that it appears on the screen.
         root.getChildren().add(scrollBar);
+
+
+        /** When the scroll bar changes position, change the height of Josh. */
+        scrollBar.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(
+                    ObservableValue<? extends Number> observableValue,
+                    Number oldValue,
+                    Number newValue) {
+                // newValue describes the value of the new position of the scroll bar. The numerical
+                // value of the position is based on the position of the scroll bar, and on the min
+                // and max we set above. For example, if the scroll bar is exactly in the middle of
+                // the scroll area, the position will be:
+                //      scroll minimum + (scroll maximum - scroll minimum) / 2
+                // Here, we can directly use the value of the scroll bar to set the height of Josh,
+                // because of how we set the minimum and maximum above.
+                scrollAdjust = (int) newValue.doubleValue();
+                textRoot.setLayoutY(-newValue.doubleValue());
+            }
+        });
+
+        // Resize listeners
+        scene.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override public void changed(
+                    ObservableValue<? extends Number> observableValue,
+                    Number oldScreenWidth,
+                    Number newScreenWidth) {
+                // Re-compute Allen's width.
+                WINDOW_WIDTH = newScreenWidth.intValue();
+                RenderClass RenderObj = new RenderClass();
+                RenderObj.render(charHeight);
+
+
+            }
+        });
+
+        scene.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override public void changed(
+                    ObservableValue<? extends Number> observableValue,
+                    Number oldScreenHeight,
+                    Number newScreenHeight) {
+                WINDOW_HEIGHT = newScreenHeight.intValue();
+                RenderClass RenderObj = new RenderClass();
+                RenderObj.render(charHeight);
+
+            }
+        });
+
+
 
 
         // To get information about what keys the user is pressing, create an EventHandler.
@@ -482,6 +537,8 @@ public class Editor extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+
 
     public static void main(String[] args) {
         launch(args);
