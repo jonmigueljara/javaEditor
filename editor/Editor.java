@@ -4,9 +4,11 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -26,6 +28,7 @@ public class Editor extends Application {
     private static final int WINDOW_WIDTH = 500;
     private static final int WINDOW_HEIGHT = 500;
     private Group root = new Group();
+    Group textRoot = new Group();
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
     public int charHeight;
@@ -51,6 +54,7 @@ public class Editor extends Application {
         private static final int STARTING_TEXT_POSITION_X = 0;
         private static final int STARTING_TEXT_POSITION_Y = 0;
 
+
         /** The Text to display on the screen. */
         private Text displayText = new Text(STARTING_TEXT_POSITION_X, STARTING_TEXT_POSITION_Y, "");
         private int fontSize = STARTING_FONT_SIZE;
@@ -74,12 +78,15 @@ public class Editor extends Application {
             // initialize cursor at the beginning
             cursor.setX(0);
             cursor.setY(0);
-            root.getChildren().add(cursor);
+            textRoot.getChildren().add(cursor);
+
         }
 
         @Override
         public void handle(KeyEvent keyEvent) {
            RenderClass RenderObj = new RenderClass();
+
+
             if (keyEvent.getEventType() == KeyEvent.KEY_TYPED) {
                 String characterTyped = keyEvent.getCharacter();
                 if (characterTyped.length() > 0 && characterTyped.charAt(0) != 8) {
@@ -155,16 +162,9 @@ public class Editor extends Application {
         private void deleteChar() {
             // new cursor position is the previous position + the previous character width
 
+            textRoot.getChildren().remove(textList.currentNode.text);
+            textList.deleteCurrentNode();
 
-            if (textList.currentNode.previous.text.getText() == "X") {
-                root.getChildren().remove(textList.currentNode.text);
-                textList.deleteCurrentNode();
-                root.getChildren().remove(textList.currentNode.text);
-                textList.deleteCurrentNode();
-            } else {
-                root.getChildren().remove(textList.currentNode.text);
-                textList.deleteCurrentNode();
-            }
         }
 
 
@@ -184,7 +184,7 @@ public class Editor extends Application {
             textList.addAtCurrentNode(nextText);
 
             // add to the root
-            root.getChildren().add(nextText);
+            textRoot.getChildren().add(nextText);
         }
     }
 
@@ -434,7 +434,28 @@ public class Editor extends Application {
 
         // The Scene represents the window: its height and width will be the height and width
         // of the window displayed.
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
+
+        root.getChildren().add(textRoot);
+
+        Scene scene = new Scene(root, WINDOW_WIDTH + 20, WINDOW_HEIGHT, Color.WHITE);
+
+
+
+        // Make a vertical scroll bar on the right side of the screen.
+        ScrollBar scrollBar = new ScrollBar();
+        scrollBar.setOrientation(Orientation.VERTICAL);
+        // Set the height of the scroll bar so that it fills the whole window.
+        scrollBar.setPrefHeight(WINDOW_HEIGHT);
+
+        // Set the range of the scroll bar.
+        scrollBar.setMin(0);
+        scrollBar.setMax(WINDOW_HEIGHT);
+
+        scrollBar.setLayoutX(WINDOW_WIDTH + 1);
+
+        // Add the scroll bar to the scene graph, so that it appears on the screen.
+        root.getChildren().add(scrollBar);
+
 
         // To get information about what keys the user is pressing, create an EventHandler.
         // EventHandler subclasses must override the "handle" function, which will be called
