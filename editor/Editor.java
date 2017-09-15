@@ -30,6 +30,7 @@ public class Editor extends Application {
 
     int currentLine;
     int maxLine;
+    int cursorLine;
     private HashMap<Integer, FastLinkedList.Node> lineMap = new HashMap<Integer, FastLinkedList.Node>();
 
 
@@ -45,8 +46,8 @@ public class Editor extends Application {
 
 
         private static final int STARTING_FONT_SIZE = 20;
-        private static final int STARTING_TEXT_POSITION_X = 250;
-        private static final int STARTING_TEXT_POSITION_Y = 250;
+        private static final int STARTING_TEXT_POSITION_X = 0;
+        private static final int STARTING_TEXT_POSITION_Y = 0;
 
         /** The Text to display on the screen. */
         private Text displayText = new Text(STARTING_TEXT_POSITION_X, STARTING_TEXT_POSITION_Y, "");
@@ -88,25 +89,29 @@ public class Editor extends Application {
 
             } else if (keyEvent.getEventType() == KeyEvent.KEY_PRESSED) {
                 KeyCode code = keyEvent.getCode();
-
-                if (code == KeyCode.UP) {
-                    System.out.println(currentLine);
-                    if (currentLine != 0) {
-                        currentLine--;
-                        searchline(currentLine, (int) textList.currentNode.text.getX());
-                        setCursorToCurrentNode();
+                System.out.println("Current Line: " +  cursorLine);
+                System.out.println("Max Line: " +  maxLine);
+                if (code == KeyCode.COMMAND) {
+                    System.out.println("Current Node: " + textList.currentNode.text.getText());
+                    for (int i = 0; i <= maxLine; i++) {
+                        System.out.println("i: " + i + " " + lineMap.get(i).text.getText());
                     }
-                    System.out.println("Current Line: " + currentLine);
-                } else if (code == KeyCode.DOWN) {
-
-                    if (currentLine != maxLine) {
-                        currentLine++;
-                        searchline(currentLine, (int) textList.currentNode.text.getX());
-                        setCursorToCurrentNode();
-                    }
-                    System.out.println("Current Line: " + currentLine);
-                    System.out.println("Max Line: " + maxLine);
                 }
+                if (code == KeyCode.UP) {
+                    if (cursorLine != 0) {
+                        cursorLine--;
+                        searchline(cursorLine, (int) textList.currentNode.text.getX());
+                        setCursorToCurrentNode();
+                    }
+
+                } else if (code == KeyCode.DOWN) {
+                    if (cursorLine != maxLine) {
+                        cursorLine++;
+                        searchline(cursorLine, (int) textList.currentNode.text.getX());
+                        setCursorToCurrentNode();
+                    }
+                }
+
 
                 if (textList.currentNode.previous != null) {
                     if (code == KeyCode.BACK_SPACE) {
@@ -116,8 +121,8 @@ public class Editor extends Application {
 
                     } else if (code == KeyCode.LEFT) {
                         // if the right node is at X = 0, then we jumped down a line
-                        if (textList.currentNode.previous.text.getX() == 0) {
-                            currentLine--;
+                        if (textList.currentNode.text.getX() == 0) {
+                            cursorLine--;
                         }
                         //move the current node left
                         textList.currentNode = textList.currentNode.previous;
@@ -129,8 +134,9 @@ public class Editor extends Application {
                 if (textList.currentNode.next != null) {
                     if (code == KeyCode.RIGHT) {
                         // if the right node is at X = 0, then we jumped down a line
+
                         if (textList.currentNode.next.text.getX() == 0) {
-                            currentLine++;
+                            cursorLine++;
                         }
                         //move the current node Right
                         textList.currentNode = textList.currentNode.next;
@@ -150,7 +156,7 @@ public class Editor extends Application {
 
         private void searchline (int line, int xPos) {
             FastLinkedList.Node nodePtr = lineMap.get(line);
-            while (nodePtr.next != null && nodePtr.next.text.getX() < xPos) {
+            while (nodePtr.next != null && nodePtr.next.text.getText().hashCode() != 13 && nodePtr.next.text.getX() < xPos) {
                 nodePtr = nodePtr.next;
             }
             textList.currentNode = nodePtr;
@@ -159,8 +165,16 @@ public class Editor extends Application {
         private void deleteChar() {
             // new cursor position is the previous position + the previous character width
 
-            root.getChildren().remove(textList.currentNode.text);
-            textList.deleteCurrentNode();
+
+            if (textList.currentNode.previous.text.getText() == "X") {
+                root.getChildren().remove(textList.currentNode.text);
+                textList.deleteCurrentNode();
+                root.getChildren().remove(textList.currentNode.text);
+                textList.deleteCurrentNode();
+            } else {
+                root.getChildren().remove(textList.currentNode.text);
+                textList.deleteCurrentNode();
+            }
         }
 
 
@@ -176,7 +190,6 @@ public class Editor extends Application {
             nextText.setTextOrigin(VPos.TOP);
             nextText.setFont(Font.font(fontName, fontSize));
 
-           int newCharWidth = (int) nextText.getLayoutBounds().getWidth();
             // add to the text list
             textList.addAtCurrentNode(nextText);
 
@@ -211,7 +224,9 @@ public class Editor extends Application {
          */
         public void render(int charHeight) {
             currentLine = 0;
+            cursorLine = 0;
             maxLine = 0;
+            boolean foundCursor = false;
             // loop through every node in the textList
             for (FastLinkedList.Node n : textList) {
                 // set wordlength, wordstart, previous and new character widths
@@ -223,7 +238,27 @@ public class Editor extends Application {
 
                 // call method to handle word wrap
                 // if the next character is too long
+                if (n == textList.currentNode) {
+                    foundCursor = true;
+                }
+
+                if (n.text.getText().hashCode() == 13) {
+
+                    if (!foundCursor) {
+                        cursorLine++;
+                    }
+                    maxLine++;
+                    xPos = 0;
+                    yPos += charHeight;
+                    lineMap.put(++currentLine, n.next);
+                }
+
+
                 if (xPos + newCharWidth > WINDOW_WIDTH) {
+                    maxLine++;
+                    if (!foundCursor) {
+                        cursorLine++;
+                    }
                    xPos = handleWordWrap(charHeight, n);
                 }
 
@@ -231,9 +266,13 @@ public class Editor extends Application {
                 n.text.setX(xPos);
                 n.text.setY(yPos);
             }
+
+
             if (textList.currentNode.previous != null ) {
                 cursor.setX((int) textList.currentNode.text.getX()
                         + (int) textList.currentNode.text.getLayoutBounds().getWidth());
+            } else {
+                cursor.setX(0);
             }
             cursor.setY((int)textList.currentNode.text.getY());
         }
@@ -290,13 +329,12 @@ public class Editor extends Application {
                 // if the word fits in the next line
                 if (wordLegnth + newCharWidth < WINDOW_WIDTH) {
                     // call bringWordDown method
-                    xPos = bringWordDown(wordStart, n, xPos, yPos);
                     lineMap.put(++currentLine, wordStart);
+                    xPos = bringWordDown(wordStart, n, xPos, yPos);
                 } else {
                     lineMap.put(++currentLine, n);
                 }
             //keep track of max line
-            maxLine++;
             return xPos;
         }
     }
