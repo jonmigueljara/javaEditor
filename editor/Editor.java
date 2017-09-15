@@ -9,6 +9,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -27,6 +28,7 @@ public class Editor extends Application {
     private Group root = new Group();
     FastLinkedList textList = new FastLinkedList();
     private final Rectangle cursor;
+    public int charHeight;
 
     int currentLine;
     int maxLine;
@@ -55,7 +57,7 @@ public class Editor extends Application {
         private String fontName = "Verdana";
 
 
-        public int charHeight;
+
 
         KeyEventHandler(final Group root, int windowWidth, int windowHeight) {
             //Initialize blank text so the we can use it's dimension for the cursor
@@ -148,19 +150,7 @@ public class Editor extends Application {
             }
         }
 
-        private void setCursorToCurrentNode() {
-            cursor.setX((int) textList.currentNode.text.getX()
-                    + (int) textList.currentNode.text.getLayoutBounds().getWidth());
-            cursor.setY((int) textList.currentNode.text.getY());
-        }
 
-        private void searchline (int line, int xPos) {
-            FastLinkedList.Node nodePtr = lineMap.get(line);
-            while (nodePtr.next != null && nodePtr.next.text.getText().hashCode() != 13 && nodePtr.next.text.getX() < xPos) {
-                nodePtr = nodePtr.next;
-            }
-            textList.currentNode = nodePtr;
-        }
 
         private void deleteChar() {
             // new cursor position is the previous position + the previous character width
@@ -197,6 +187,9 @@ public class Editor extends Application {
             root.getChildren().add(nextText);
         }
     }
+
+
+
 
     public class RenderClass {
         private int xPos;
@@ -364,6 +357,64 @@ public class Editor extends Application {
         }
     }
 
+    private class MouseClickEventHandler implements EventHandler<MouseEvent> {
+        /** A Text object that will be used to print the current mouse position. */
+        Text positionText;
+
+        MouseClickEventHandler(Group root) {
+        }
+
+
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            // Because we registered this EventHandler using setOnMouseClicked, it will only called
+            // with mouse events of type MouseEvent.MOUSE_CLICKED.  A mouse clicked event is
+            // generated anytime the mouse is pressed and released on the same JavaFX node.
+            double mousePressedX = mouseEvent.getX();
+            double mousePressedY = mouseEvent.getY();
+
+            double line;
+
+
+            line = Math.floor(mousePressedY/charHeight);
+            // Display text right above the click.
+
+            if (line <= maxLine) {
+                searchline((int) line, (int) mousePressedX);
+                setCursorToCurrentNode();
+                cursorLine = (int) line;
+            }
+
+        }
+    }
+
+
+    // helper functions
+    /**
+     * scans through the line until xPos is reached and set's current node to that closest position
+     * @param line line to jump to
+     * @param xPos horizontal distance to jump to
+     */
+    private void searchline (int line, int xPos) {
+        FastLinkedList.Node nodePtr = lineMap.get(line);
+        while (nodePtr.next != null && nodePtr.next.text.getText().hashCode() != 13 && nodePtr.next.text.getX() < xPos) {
+            // if the next node is closer
+            if (Math.abs(nodePtr.next.text.getX() - xPos) < Math.abs(nodePtr.text.getX() - xPos)) ;
+                nodePtr = nodePtr.next;
+            }
+        textList.currentNode = nodePtr;
+    }
+
+    /**
+     * used for setting the cursor to the current node position
+     */
+    private void setCursorToCurrentNode() {
+        cursor.setX((int) textList.currentNode.text.getX()
+                + (int) textList.currentNode.text.getLayoutBounds().getWidth());
+        cursor.setY((int) textList.currentNode.text.getY());
+    }
+
+
     /** Makes the text bounding box change color periodically. */
     public void makeRectangleColorChange() {
         // Create a Timeline that will call the "handle" function of RectangleBlinkEventHandler
@@ -398,9 +449,10 @@ public class Editor extends Application {
         scene.setOnKeyPressed(keyEventHandler);
 
 
-
         //call the color change
         makeRectangleColorChange();
+
+        scene.setOnMouseClicked(new MouseClickEventHandler(root));
 
 
         primaryStage.setTitle("Jon Miguel Editor");
