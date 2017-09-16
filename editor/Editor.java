@@ -446,8 +446,6 @@ public class Editor extends Application {
 
         Scene scene = new Scene(root, WINDOW_WIDTH + 20, WINDOW_HEIGHT, Color.WHITE);
 
-        RenderClass RenderObj = new RenderClass();
-
         // Make a vertical scroll bar on the right side of the screen.
         ScrollBar scrollBar = new ScrollBar();
         scrollBar.setOrientation(Orientation.VERTICAL);
@@ -458,7 +456,7 @@ public class Editor extends Application {
         scrollBar.setMin(0);
         scrollBar.setMax(WINDOW_HEIGHT);
 
-        scrollBar.setLayoutX(WINDOW_WIDTH + 1);
+        scrollBar.setLayoutX(WINDOW_WIDTH);
 
         // Add the scroll bar to the scene graph, so that it appears on the screen.
         root.getChildren().add(scrollBar);
@@ -490,6 +488,7 @@ public class Editor extends Application {
                     Number newScreenWidth) {
                 // Re-compute Allen's width.
                 WINDOW_WIDTH = newScreenWidth.intValue();
+                scrollBar.setLayoutX(WINDOW_WIDTH - 20);
                 RenderClass RenderObj = new RenderClass();
                 RenderObj.render(charHeight);
 
