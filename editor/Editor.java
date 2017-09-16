@@ -487,12 +487,10 @@ public class Editor extends Application {
                     Number oldScreenWidth,
                     Number newScreenWidth) {
                 // Re-compute Allen's width.
-                WINDOW_WIDTH = newScreenWidth.intValue();
-                scrollBar.setLayoutX(WINDOW_WIDTH - 20);
+                WINDOW_WIDTH = newScreenWidth.intValue() - 20;
+                scrollBar.setLayoutX(WINDOW_WIDTH);
                 RenderClass RenderObj = new RenderClass();
                 RenderObj.render(charHeight);
-
-
             }
         });
 
@@ -502,6 +500,9 @@ public class Editor extends Application {
                     Number oldScreenHeight,
                     Number newScreenHeight) {
                 WINDOW_HEIGHT = newScreenHeight.intValue();
+                scrollBar.setPrefHeight(WINDOW_HEIGHT);
+                scrollBar.setMin(0);
+                scrollBar.setMax(WINDOW_HEIGHT);
                 RenderClass RenderObj = new RenderClass();
                 RenderObj.render(charHeight);
 
