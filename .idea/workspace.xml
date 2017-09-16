@@ -2,49 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1472d1b6-7a7f-4a2b-a3f4-e207572f33ac" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AGArrowKeyTest.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AGBackspaceTest.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AGInitialCursorTest.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AGNewlineTest.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AGSimpleTextTest.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AGUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AbstractEditorTest$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/editorTester/AbstractEditorTest.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/ClipboardExample.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/CopyFile.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/KeyPressPrinter.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/MouseClickPositionPrinter.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/PathDrawer.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/ResizeAllen.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/ScrollBarExample.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/ShortcutKeyPrinter.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/SingleLetterDisplay.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/SingleLetterDisplaySimple.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/allen2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/example_files/example_linux_newlines.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/example_files/example_windows_newlines.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/josh1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/examples/readme.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/.gitkeep" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/hug_blownup.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/hug_blownup_retina.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/hug_screenshot.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/long_word_1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/long_word_2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/long_word_3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/long_word_4.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/newline_example.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/proj2-scroll-bar-tips.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/proj2.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/scrollbar.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/scrollbar_3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/scrollbar_5_100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/scrollbar_middle.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/scrollbar_top.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/selected_text.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/word_wrap_post_wrap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/word_wrap_pre_wrap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/spec/word_wrap_un_wrap.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -76,8 +34,8 @@
       <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="8" lean-forward="false" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
+            <state relative-caret-position="343">
+              <caret line="26" column="17" lean-forward="false" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -695,8 +653,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="8" lean-forward="false" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
+        <state relative-caret-position="343">
+          <caret line="26" column="17" lean-forward="false" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
           <folding />
         </state>
       </provider>
