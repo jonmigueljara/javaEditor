@@ -12,7 +12,7 @@
 	* Word based word wrapping
 	* Constant time cursor movement with arrow keys and mouse clicks
 	* Scroll Bar
-	* Window resizes with text/ scrollbar
+	* Window resizes with text/scrollbar
 
 ## Implementation
    * FastLinkedList
@@ -25,3 +25,9 @@
 
    * Render method
         - renders Text objects by updating each Text position as well as the current Cursor position
+
+
+## TODO
+    * Implement Open/Save files
+    * Undo/Redo
+    * Copy/Paste
