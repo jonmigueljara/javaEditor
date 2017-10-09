@@ -34,7 +34,7 @@
 
 ## SreenShots
 
-<img src="img/editorStart.png" alt="Drawing" height="400"/>
+<img src="img/editorStart.png" alt="" height="400"/>
 
 Resize Example:
-<img src="img/.png" alt="resize" height="400"/>
+<img src="img/resize.png" alt="" height="400"/>
