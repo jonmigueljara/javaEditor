@@ -34,7 +34,7 @@
 
 ## SreenShots
 
-<table border = "1" id="characterTable">
+<table id="characterTable">
 
 <tr>
 <td id = "first"> <img src="img/editorStart.png" alt="" height="400"/> </td>
