@@ -34,7 +34,16 @@
 
 ## SreenShots
 
-<img src="img/editorStart.png" alt="" height="400"/>
+<table border = "1" id="characterTable">
 
-Resize Example:
-<img src="img/resize.png" alt="" height="400"/>
+<tr>
+<td id = "first"> <img src="img/editorStart.png" alt="" height="400"/> </td>
+<td> <img src="img/resize.png" alt="" height="400"/> </td>
+</tr>
+
+
+
+
+  	
+
+</table>
