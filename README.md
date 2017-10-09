@@ -31,3 +31,10 @@
     * Implement Open/Save files
     * Undo/Redo
     * Copy/Paste
+
+## SreenShots
+
+<img src="img/editorStart.png" alt="Drawing" height="400"/>
+
+Resize Example:
+<img src="img/.png" alt="resize" height="400"/>
